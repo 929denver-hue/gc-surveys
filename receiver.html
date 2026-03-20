@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GC贈物網影響力評估：受贈個人</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media (max-width: 767px) {
+            .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block; }
+            .table-container thead { display: none; }
+            .table-container tr { margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            .table-container td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f1f5f9; }
+            .table-container td:last-child { border-bottom: none; }
+            .table-container td::before { content: attr(data-label); font-weight: 500; color: #475569; font-size: 0.875rem; max-width: 60%; line-height: 1.4; }
+            .table-container td:first-child { display: block; font-weight: 700; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 0.5rem; font-size: 1rem; max-width: 100%; }
+            .table-container td:first-child::before { content: ""; }
+        }
+        input[type="radio"]:checked { transform: scale(1.2); }
+        .matrix-row-selected { background-color: #f0fdf4 !important; border-color: #bbf7d0 !important; }
+        .error-highlight { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; border-radius: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans pb-32">
+    
+    <div id="app"></div>
+
+    <script src="survey-engine.js"></script>
+    
+    <script>
+        // 受贈個人專屬設定檔
+        const config = {
+            surveyId: "受贈個人", // 對應 Excel 頁籤名稱
+            title: "GC贈物網影響力評估：受贈個人",
+            description: "請根據您在GC贈物網的獲贈經驗填答以下問題，問卷預計花費您10分鐘寶貴的時間。",
+            baseQuestion: {
+                description: "請依據您的經驗或主觀判斷進行回答",
+                title: "從GC贈物網獲得的物資中，如果沒有從GC獲得物資，您判斷有多少比例需要自行購買新品，或從其他管道獲贈新品？",
+                options: ["0-20%", "20-40%", "40-60%", "60-80%", "80-100%"]
+            },
+            matrixDescription: "請依據您的主觀感受與認知回答",
+            matrix1: {
+                title: "1. 您在GC贈物網獲得贈物物資時，是否在下列面向有所收穫？",
+                labels: ["非常顯著", "顯著", "有些", "不認為或不確定"],
+                items: ["免費獲贈物品", "更容易獲贈物品", "增進惜物與環保減碳的知識", "增進公益組織與相關知識", "延續物品使用或循環永續價值的快樂", "感受社會善意與愛心", "能匿名募集物資", "逛逛GC贈物網的滿足", "促進親友參與", "增進會員與同好交流"]
+            },
+            matrix2: {
+                title: "2. 和其他獲贈經驗相比，您在GC贈物網的收穫是否特別？",
+                labels: ["難以取代", "相對較高", "差不多", "不如其他"],
+                items: ["免費獲贈物品", "更容易獲贈物品", "增進惜物與環保減碳的知識", "增進公益組織與相關知識", "延續物品使用或循環永續價值的快樂", "感受社會善意與愛心", "能匿名募集物資", "逛逛GC贈物網的滿足", "促進親友參與", "增進會員與同好交流"]
+            },
+            pointsConfig: {
+                description: "根據在GC贈物網的獲贈經驗，如果您手上有100點，請依照您認為的價值大小來分配點數給以下四項，四項加總100即可。",
+                items: ["免費受贈物資", "循環分享知能增進", "受贈感性價值", "人際增進價值"]
+            },
+            matrix3: {
+                title: "1. 請問您認為GC贈物網尚可再精進／提升之處？",
+                labels: ["滿意", "無意見", "希望改善", "非常需要改善"],
+                items: ["物品的分類類別易於尋找", "可索取的物品類型和數量足夠", "協助品質控管的審核制度", "詳細的物品資訊（正反面、材質、標籤等）", "通報客服管道易於尋找", "客服回覆效率", "會員交流方便性", "活動舉辦頻率", "「物流業者」選擇多樣性", "「金流支付」選擇多樣性"]
+            }
+        };
+
+        // 啟動引擎
+        new SurveyEngine(config);
+    </script>
+</body>
+</html>
