@@ -341,7 +341,7 @@ class SurveyEngine {
 
         try {
             // ⚠️ 請填入您的萬能路由 API 網址
-            const API_URL = 'https://script.google.com/macros/s/您的萬能路由網址/exec';
+            const API_URL = 'https://script.google.com/macros/s/AKfycbyz4GriyYF0U9KfWrWAITKjffWK90bNxbEYZQs4GqG2RulzrZo2Tu_z8c3MceYgiyaGYA/exec';
             const response = await fetch(API_URL, {
                 method: 'POST', body: JSON.stringify(dataObj), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
             });
