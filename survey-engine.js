@@ -38,12 +38,14 @@ class SurveyEngine {
                     <input type="hidden" name="survey_target" value="${this.config.surveyId}">
         `;
 
-        // 1. 基本問題 (若有)
+        // 1. 基本問題 (動態加入副標題)
         if (this.config.baseQuestion) {
             this.totalRequired += 1;
+            let descHtml = this.config.baseQuestion.description ? `<p class="text-sm text-gray-500 mb-6">${this.config.baseQuestion.description}</p>` : '';
             html += `
                 <section>
                     <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">基本問題</h2>
+                    ${descHtml}
                     <div class="mb-8 p-4 bg-white border border-gray-200 rounded-lg shadow-sm" data-name="q0_container">
                         <label class="block font-semibold mb-4 text-lg">${this.config.baseQuestion.title} <span class="text-red-500 font-bold">*</span></label>
                         <div class="space-y-3">
@@ -59,16 +61,18 @@ class SurveyEngine {
             `;
         }
 
-        // 2. 矩陣題 1 & 2
+        // 2. 矩陣題 1 & 2 (動態加入副標題)
+        let matrixDescHtml = this.config.matrixDescription ? `<p class="text-sm text-gray-500 mb-6">${this.config.matrixDescription}</p>` : '';
         html += `
             <section>
                 <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">個別面向</h2>
+                ${matrixDescHtml}
                 ${this.renderMatrix('q1', this.config.matrix1)}
                 ${this.renderMatrix('q2', this.config.matrix2)}
             </section>
         `;
 
-        // 3. 價值結構 (點數題，動態判斷)
+        // 3. 價值結構 (點數題，維持不變)
         if (this.config.pointsConfig) {
             this.totalRequired += this.config.pointsConfig.items.length;
             html += `
@@ -98,7 +102,7 @@ class SurveyEngine {
             `;
         }
 
-        // 4. 精進之處與回饋
+        // 4. 精進之處與回饋 (維持不變)
         html += `
             <section>
                 <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">精進之處</h2>
