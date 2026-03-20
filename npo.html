@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GC贈物網影響力評估：受贈社福</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 貼入之前提供的 Mobile Card CSS 樣式即可 */
+        @media (max-width: 767px) { ...略... }
+        input[type="radio"]:checked { transform: scale(1.2); }
+        .matrix-row-selected { background-color: #f0fdf4 !important; border-color: #bbf7d0 !important; }
+        .error-highlight { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans pb-32">
+    
+    <div id="app"></div>
+
+    <script src="survey-engine.js"></script>
+    <script>
+        // 初始化設定檔
+        const config = {
+            surveyId: "受贈社福", // 這個 ID 會傳給後端路由
+            title: "GC贈物網影響力評估：受贈社福",
+            description: "請根據貴組織在GC贈物網的獲贈經驗填答以下問題，問卷預計花費您10分鐘寶貴的時間。",
+            baseQuestion: {
+                title: "從GC贈物網獲得的物資中，如果沒有從GC獲得物資，您判斷有多少比例需要自行購買新品，或從其他管道獲贈新品？",
+                options: ["0-20%", "20-40%", "40-60%", "60-80%", "80-100%"]
+            },
+            matrix1: {
+                title: "1. 貴組織在GC贈物網獲得贈物物資時，是否在下列面向有所收穫？",
+                labels: ["非常顯著", "顯著", "有些", "不認為或不確定"],
+                items: ["免費獲贈物品", "有利推展組織業務", "增進個案服務成效", "增進專案管理知能", "增進組織行銷推廣知能與經驗", "節省物資處理人時成本", "減輕物資募集壓力", "拓展公益與環保合作夥伴", "拓展企業贈物方關係網絡", "提升組織知名度與能見度", "獲得個案或案家肯定"]
+            },
+            matrix2: {
+                title: "2. 和其他獲贈經驗相比，貴組織在GC贈物網的收穫是否特別？",
+                labels: ["難以取代", "相對較高", "差不多", "不如其他"],
+                items: ["免費獲贈物品", "有利推展組織業務", "增進個案服務成效", "增進專案管理知能", "增進組織行銷推廣知能與經驗", "節省物資處理人時成本", "減輕物資募集壓力", "拓展公益與環保合作夥伴", "拓展企業贈物方關係網絡", "提升組織知名度與能見度", "獲得個案或案家肯定"]
+            },
+            pointsConfig: null, // 🔥 社福沒有點數題，直接設為 null，引擎就會自動隱藏！
+            matrix3: {
+                title: "1. 請問您認為GC贈物網尚可再精進／提升之處？",
+                labels: ["滿意", "無意見", "希望改善", "非常需要改善"],
+                items: ["窗口溝通品質", "物資種類和數量", "物資媒合速度", "獲贈之物資情況", "企業／組織贈物物資的實用性", "專案執行流程及效率", "給社工愛的鼓勵活動", "會員持續交流方便性"]
+            }
+        };
+
+        // 啟動引擎！
+        new SurveyEngine(config);
+    </script>
+</body>
+</html>
