@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GC贈物網影響力評估 - 問卷導航中控台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        /* 彈出視窗動畫 */
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.2s ease-out; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen relative">
+
+    <header class="bg-indigo-600 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold">🎯 GC贈物網影響力評估</h1>
+                <p class="mt-2 text-indigo-100 text-sm md:text-base">內部問卷導航中控台｜請依據您的訪問對象，點擊對應的連結。</p>
+            </div>
+            <button onclick="openLoginModal()" class="bg-indigo-800 hover:bg-indigo-900 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-colors flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                進入數據後台
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 pb-10">
+        
+        <div class="mb-10">
+            <h2 class="text-xl font-bold text-gray-700 border-b-2 border-indigo-200 pb-2 mb-4 flex items-center">
+                <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded mr-2">類別 1</span> 贈物方問卷
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="./enterprise.html" target="_blank" class="block bg-white rounded-xl border border-gray-200 p-6 card-hover group">
+                    <h3 class="text-lg font-bold text-indigo-700 group-hover:text-indigo-600 mb-2">🏢 贈物企業</h3>
+                    <p class="text-sm text-gray-500 mb-4 h-10">針對在平台提供物資的企業端聯絡窗口或決策者。</p>
+                    <div class="text-sm font-semibold text-indigo-600 flex items-center">開啟問卷 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+                </a>
+                <a href="./employee.html" target="_blank" class="block bg-white rounded-xl border border-gray-200 p-6 card-hover group">
+                    <h3 class="text-lg font-bold text-indigo-700 group-hover:text-indigo-600 mb-2">💼 贈物企業員工</h3>
+                    <p class="text-sm text-gray-500 mb-4 h-10">針對參與企業贈物專案的內部員工。</p>
+                    <div class="text-sm font-semibold text-indigo-600 flex items-center">開啟問卷 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+                </a>
+                <a href="./donor.html" target="_blank" class="block bg-white rounded-xl border border-gray-200 p-6 card-hover group">
+                    <h3 class="text-lg font-bold text-indigo-700 group-hover:text-indigo-600 mb-2">🙋‍♂️ 贈物個人</h3>
+                    <p class="text-sm text-gray-500 mb-4 h-10">針對在平台上自發性贈送閒置物資的個人用戶。</p>
+                    <div class="text-sm font-semibold text-indigo-600 flex items-center">開啟問卷 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+                </a>
+            </div>
+        </div>
+
+        <div class="mb-10">
+            <h2 class="text-xl font-bold text-gray-700 border-b-2 border-emerald-200 pb-2 mb-4 flex items-center">
+                <span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded mr-2">類別 2</span> 受贈方問卷
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="./npo.html" target="_blank" class="block bg-white rounded-xl border border-gray-200 p-6 card-hover group">
+                    <h3 class="text-lg font-bold text-emerald-700 group-hover:text-emerald-600 mb-2">🤝 受贈社福</h3>
+                    <p class="text-sm text-gray-500 mb-4 h-10">針對在平台獲贈物資的社福機構與公益組織。</p>
+                    <div class="text-sm font-semibold text-emerald-600 flex items-center">開啟問卷 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+                </a>
+                <a href="./school.html" target="_blank" class="block bg-white rounded-xl border border-gray-200 p-6 card-hover group">
+                    <h3 class="text-lg font-bold text-emerald-700 group-hover:text-emerald-600 mb-2">🏫 受贈學校</h3>
+                    <p class="text-sm text-gray-500 mb-4 h-10">針對在平台獲贈物資的各級學校單位。</p>
+                    <div class="text-sm font-semibold text-emerald-600 flex items-center">開啟問卷 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+                </a>
+                <a href="./receiver.html" target="_blank" class="block bg-white rounded-xl border border-gray-200 p-6 card-hover group">
+                    <h3 class="text-lg font-bold text-emerald-700 group-hover:text-emerald-600 mb-2">🙋‍♀️ 受贈個人</h3>
+                    <p class="text-sm text-gray-500 mb-4 h-10">針對在平台上接受物資餽贈的個人用戶。</p>
+                    <div class="text-sm font-semibold text-emerald-600 flex items-center">開啟問卷 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+                </a>
+            </div>
+        </div>
+
+        <div class="mb-10">
+            <h2 class="text-xl font-bold text-gray-700 border-b-2 border-amber-200 pb-2 mb-4 flex items-center">
+                <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded mr-2">類別 3</span> 活動參與者
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="./social_worker.html" target="_blank" class="block bg-white rounded-xl border border-gray-200 p-6 card-hover group">
+                    <h3 class="text-lg font-bold text-amber-600 group-hover:text-amber-500 mb-2">⭐ 社工 (表揚活動)</h3>
+                    <p class="text-sm text-gray-500 mb-4 h-10">針對參與過GC贈物網社工表揚活動的人員。</p>
+                    <div class="text-sm font-semibold text-amber-600 flex items-center">開啟問卷 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-12 text-center bg-gray-100 p-8 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-700 mb-2">內部營運管理</h3>
+            <p class="text-sm text-gray-500 mb-4">需輸入管理員帳號密碼，方可查看所有填答原始資料。</p>
+            <button onclick="openLoginModal()" class="bg-gray-800 hover:bg-gray-900 text-white px-8 py-3 rounded-lg font-bold shadow-md transition-colors inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                查看 Excel 數據總表
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-6 text-center text-sm text-gray-500">
+        內部問卷導航系統 © 樹冠影響力投資股份有限公司
+    </footer>
+
+    <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden modal-enter" id="modal-content">
+            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    管理員登入
+                </h3>
+                <button onclick="closeLoginModal()" class="text-indigo-200 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">帳號</label>
+                    <input type="text" id="username" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="輸入帳號">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">密碼</label>
+                    <input type="password" id="password" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="輸入密碼" onkeypress="if(event.key === 'Enter') verifyLogin()">
+                </div>
+                <div id="error-msg" class="text-red-500 text-sm font-semibold hidden">帳號或密碼錯誤，請重新輸入。</div>
+                <button onclick="verifyLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg mt-2 transition-colors">
+                    確認登入
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('login-modal');
+        const modalContent = document.getElementById('modal-content');
+        
+        // ⚠️ 請在這裡貼上您真實的 Google 試算表共用網址
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/10sf6mdy2gXAgG1S9Qac08kSucFHpciGZ1bSKzZXnr1I/edit?usp=sharing";
+
+        function openLoginModal() {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.add('modal-enter-active');
+            }, 10);
+            document.getElementById('username').focus();
+        }
+
+        function closeLoginModal() {
+            modalContent.classList.remove('modal-enter-active');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('error-msg').classList.add('hidden');
+            }, 200);
+        }
+
+        function verifyLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            // 驗證您指定的帳號密碼
+            if (user === "give-circle" && pass === "canopi") {
+                errorMsg.classList.add('hidden');
+                closeLoginModal();
+                // 另開新分頁前往 Excel
+                window.open(sheetUrl, "_blank");
+            } else {
+                errorMsg.classList.remove('hidden');
+                // 錯誤時的震動小動畫
+                modalContent.style.transform = "translateX(-5px)";
+                setTimeout(() => modalContent.style.transform = "translateX(5px)", 50);
+                setTimeout(() => modalContent.style.transform = "translateX(0)", 100);
+            }
+        }
+    </script>
+</body>
+</html>
