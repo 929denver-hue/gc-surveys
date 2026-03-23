@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GC贈物網影響力評估：受贈學校</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media (max-width: 767px) {
+            .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block; }
+            .table-container thead { display: none; }
+            .table-container tr { margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            .table-container td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f1f5f9; }
+            .table-container td:last-child { border-bottom: none; }
+            .table-container td::before { content: attr(data-label); font-weight: 500; color: #475569; font-size: 0.875rem; max-width: 60%; line-height: 1.4; }
+            .table-container td:first-child { display: block; font-weight: 700; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 0.5rem; font-size: 1rem; max-width: 100%; }
+            .table-container td:first-child::before { content: ""; }
+        }
+        input[type="radio"]:checked { transform: scale(1.2); }
+        .matrix-row-selected { background-color: #f0fdf4 !important; border-color: #bbf7d0 !important; }
+        .error-highlight { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; border-radius: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans pb-32">
+    
+    <div id="app"></div>
+
+    <script src="survey-engine.js"></script>
+    
+    <script>
+        // 受贈學校專屬設定檔
+        const config = {
+            surveyId: "受贈學校", // 對應 Excel 頁籤名稱
+            title: "GC贈物網影響力評估：受贈學校",
+            description: "您好：<br>請根據貴組織在GC贈物網的獲贈經驗填答以下問題，問卷預計花費您10分鐘寶貴的時間。",
+            baseQuestion: {
+                description: "請依據貴組織的經驗或主觀判斷進行回答",
+                title: "從GC贈物網獲得的物資中，如果沒有從GC獲得物資，您判斷有多少比例需要自行購買新品，或從其他管道獲贈新品？",
+                options: ["0-20%", "20-40%", "40-60%", "60-80%", "80-100%"]
+            },
+            matrixDescription: "請依據貴組織的主觀感受與認知回答",
+            matrix1: {
+                title: "1. 貴組織在GC贈物網獲得贈物物資時，是否在下列面向有所收穫？",
+                labels: ["非常顯著", "顯著", "有些", "不認為或不確定"],
+                items: ["免費獲贈物品", "有益學生品格教育", "增進校方或老師合作專案管理知能", "節省物資處理人時成本", "拓展校外合作網絡", "提升校方知名度與能見度", "獲得家長或主管機關肯定"]
+            },
+            matrix2: {
+                title: "2. 和其他獲贈經驗相比，貴組織在GC贈物網的收穫是否特別？",
+                labels: ["難以取代", "相對較高", "差不多", "不如其他"],
+                items: ["免費獲贈物品", "有益學生品格教育", "增進校方或老師合作專案管理知能", "節省物資處理人時成本", "拓展校外合作網絡", "提升校方知名度與能見度", "獲得家長或主管機關肯定"]
+            },
+            pointsConfig: null, // 學校沒有點數題
+            matrix3: {
+                title: "1. 請問您認為GC贈物網尚可再精進／提升之處？",
+                labels: ["滿意", "無意見", "希望改善", "非常需要改善"],
+                items: ["容易獲得GC贈物網相關活動資訊", "窗口溝通品質", "洽談合作的行政流程及效率", "活動帶領者的教學能力", "工作人員服務品質與態度", "活動內容的多樣性", "活動流程的安排與流暢度", "活動內容適合學生", "活動內容及品質", "持續性的活動合作及物資供給", "創造更多元的合作形式"] // 🌟 已加上 GC 正名
+            }
+        };
+
+        new SurveyEngine(config);
+    </script>
+</body>
+</html>
