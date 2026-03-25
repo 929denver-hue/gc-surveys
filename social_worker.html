@@ -1,68 +1,56 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GC贈物網影響力評估：社工</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @media (max-width: 767px) {
-            .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block; }
-            .table-container thead { display: none; }
-            .table-container tr { margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-            .table-container td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f1f5f9; }
-            .table-container td:last-child { border-bottom: none; }
-            .table-container td::before { content: attr(data-label); font-weight: 500; color: #475569; font-size: 0.875rem; max-width: 60%; line-height: 1.4; }
-            .table-container td:first-child { display: block; font-weight: 700; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 0.5rem; font-size: 1rem; max-width: 100%; }
-            .table-container td:first-child::before { content: ""; }
-        }
-        input[type="radio"]:checked { transform: scale(1.2); }
-        .matrix-row-selected { background-color: #f0fdf4 !important; border-color: #bbf7d0 !important; }
-        .error-highlight { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; border-radius: 0.5rem; }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans pb-32">
-    
-    <div id="app"></div>
-
-    <script src="survey-engine.js"></script>
-    
-    <script>
-        // 社工專屬設定檔
-       const config = {
+const config = {
             surveyId: "社工", 
             title: "GC贈物網影響力評估：社工",
             description: "您好：<br>請根據您參與GC贈物網的經驗填答以下問題，問卷預計花費您10分鐘寶貴的時間。",
             baseQuestion: null, 
             matrixDescription: "請依據您的主觀感受與認知回答",
             matrix1: {
-                title: "1. 您參與GC贈物網及社工表揚活動時，是否在下列面向有所收穫？",
+                title: "1. 您參與GC贈物網「給社工愛的鼓勵」活動時，是否在下列面向有所收穫？",
                 labels: ["非常顯著", "顯著", "有些", "不認為或不確定"],
-                items: ["獎品好又實用", "獲得表揚後履歷加值", "從其他社工同儕的作為中學習許多", "GC贈物網平台會員不時的鼓勵令人感動", "企業贊助的心意令人感動", "政府對社工的表揚令人鼓舞", "媒體的報導令人鼓舞", "表揚活動結識很多志同道合夥伴", "表揚活動結識很多潛在的資源提供方"]
+                items: [
+                    "獎品好又實用", 
+                    "從其他社工同儕的作為中學習許多", 
+                    "GC贈物網平台會員或其他社工同儕的鼓勵令人感動", 
+                    "企業贊助的心意令人感動", 
+                    "透過活動提升自我認同感", 
+                    "獲得和志同道合夥伴交流的機會", 
+                    "結識潛在的資源提供方"
+                ]
             },
             matrix2: {
-                title: "2. 和其他相似的活動相比，您在GC贈物網及社工表揚活動的收穫是否特別？",
+                title: "2. 和其他相似的活動相比，您在GC贈物網「給社工愛的鼓勵」活動的收穫是否特別？",
                 labels: ["難以取代", "相對較高", "差不多", "不如其他"],
-                items: ["獎品好又實用", "獲得表揚後履歷加值", "從其他社工同儕的作為中學習許多", "GC贈物網平台會員不時的鼓勵令人感動", "企業贊助的心意令人感動", "政府對社工的表揚令人鼓舞", "媒體的報導令人鼓舞", "表揚活動結識很多志同道合夥伴", "表揚活動結識很多潛在的資源提供方"]
-            },
-           pointsConfig: {
-                description: "根據參與GC贈物網及社工表揚活動的經驗，如果您手上有100點，請依照您認為的價值大小來分配點數給以下四項，四項加總100即可。",
                 items: [
-                    "獎品實用與履歷加值</span>",
-                    "知能增進 <span class='text-sm text-gray-500 font-normal'>（從其他社工同儕的經驗與作為中學習）</span>",
-                    "感性價值 <span class='text-sm text-gray-500 font-normal'>（受平台會員、企業、政府與媒體的鼓勵而深受感動）</span>",
-                    "人際效益 <span class='text-sm text-gray-500 font-normal'>（結識志同道合的夥伴與潛在的資源提供方）</span>"
+                    "獎品好又實用", 
+                    "從其他社工同儕的作為中學習許多", 
+                    "GC贈物網平台會員或其他社工同儕的鼓勵令人感動", 
+                    "企業贊助的心意令人感動", 
+                    "透過活動提升自我認同感", 
+                    "獲得和志同道合夥伴交流的機會", 
+                    "結識潛在的資源提供方"
+                ]
+            },
+            pointsConfig: {
+                description: "根據參與GC贈物網「給社工愛的鼓勵」活動的經驗，如果您手上有100點，請依照您認為的價值大小來分配點數給以下四項，四項加總100即可。",
+                items: [
+                    "獎品實用 </span>",
+                    "知能增進 <span class='text-sm text-gray-500 font-normal'>（從其他社工同儕的作為中學習許多）</span>",
+                    "感性價值 <span class='text-sm text-gray-500 font-normal'>（受會員、同儕、企業鼓勵而感動，提升自我認同）</span>",
+                    "人際效益 <span class='text-sm text-gray-500 font-normal'>（獲得交流機會並結識潛在資源提供方）</span>"
                 ]
             },
             matrix3: {
                 title: "1. 請問您認為GC贈物網尚可再精進／提升之處？",
                 labels: ["滿意", "無意見", "希望改善", "非常需要改善"],
-                // 🌟 下方第二項已將「志工」修正為「社工」
-                items: ["希望更多地方政府也能響應", "希望增加表揚活動社工分享交流機會", "希望促成更多企業參與", "希望能連結更多媒體參與報導", "希望平台有更明顯的社工故事露出", "活動前後的行政效率"]
+                items: [
+                    "希望增加活動社工分享交流機會", 
+                    "希望促成更多企業參與", 
+                    "希望能連結媒體參與報導", 
+                    "希望平台有更明顯的社工故事露出", 
+                    "希望增加活動頻率", 
+                    "希望有實體交流機會"
+                ]
             }
         };
 
         new SurveyEngine(config);
-    </script>
-</body>
-</html>
