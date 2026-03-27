@@ -37,7 +37,6 @@ class SurveyEngine {
                     <input type="hidden" name="survey_target" value="${this.config.surveyId}">
         `;
 
-        // 1. 基本問題 (動態加入副標題)
         if (this.config.baseQuestion) {
             this.totalRequired += 1;
             let descHtml = this.config.baseQuestion.description ? `<p class="text-sm text-gray-500 mb-6">${this.config.baseQuestion.description}</p>` : '';
@@ -60,7 +59,6 @@ class SurveyEngine {
             `;
         }
 
-        // 2. 矩陣題 1 & 2 (動態加入副標題)
         let matrixDescHtml = this.config.matrixDescription ? `<p class="text-sm text-gray-500 mb-6">${this.config.matrixDescription}</p>` : '';
         html += `
             <section>
@@ -71,7 +69,6 @@ class SurveyEngine {
             </section>
         `;
 
-        // 3. 價值結構 (點數題，維持不變)
         if (this.config.pointsConfig) {
             this.totalRequired += this.config.pointsConfig.items.length;
             html += `
@@ -101,7 +98,6 @@ class SurveyEngine {
             `;
         }
 
-        // 4. 精進之處與回饋 (維持不變)
         html += `
             <section>
                 <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">精進之處</h2>
@@ -130,24 +126,25 @@ class SurveyEngine {
 
     renderMatrix(namePrefix, matrixConfig) {
         this.totalRequired += matrixConfig.items.length;
+        // 移除多餘的邊框與隱藏類別，回歸最純粹的表格結構
         return `
             <div class="mb-8">
                 <label class="block font-semibold mb-3 text-lg">${matrixConfig.title} <span class="text-red-500 font-bold">*</span></label>
-                <div class="table-container overflow-x-auto border-0 md:border border-gray-200 rounded">
+                <div class="table-container">
                     <table class="w-full text-sm text-left whitespace-nowrap">
-                        <thead class="bg-gray-50 border-b hidden md:table-header-group">
+                        <thead>
                             <tr>
-                                <th class="p-3 w-1/3"></th>
-                                ${matrixConfig.labels.map(l => `<th class="p-3 text-center">${l}</th>`).join('')}
+                                <th class="p-4 w-1/3 min-w-[150px]"></th>
+                                ${matrixConfig.labels.map(l => `<th class="p-4 text-center min-w-[100px]">${l}</th>`).join('')}
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody>
                             ${matrixConfig.items.map((item, index) => `
-                                <tr class="hover:bg-gray-50 transition-colors border-transparent border-2" data-name="${namePrefix}_${index}">
-                                    <td class="p-3 font-medium whitespace-normal text-gray-800">${item}</td>
+                                <tr data-name="${namePrefix}_${index}">
+                                    <td class="p-4 font-medium whitespace-normal text-gray-800">${item}</td>
                                     ${matrixConfig.labels.map(label => `
-                                        <td class="p-3 text-center" data-label="${label}">
-                                            <label class="cursor-pointer block w-full h-full flex items-center justify-end md:justify-center">
+                                        <td class="p-4 text-center">
+                                            <label class="cursor-pointer block w-full h-full flex items-center justify-center">
                                                 <input type="radio" name="${namePrefix}_${index}" value="${label}" class="w-5 h-5 text-indigo-600">
                                             </label>
                                         </td>
@@ -164,7 +161,6 @@ class SurveyEngine {
     bindEvents() {
         const form = document.getElementById('impactForm');
         
-        // 互動反饋與暫存
         form.addEventListener('change', (e) => {
             if (e.target.type === 'radio') {
                 if (e.target.name === 'q0') {
@@ -180,11 +176,10 @@ class SurveyEngine {
             this.updateProgress();
         });
 
-        // 點數計算
         if (this.config.pointsConfig) {
             document.querySelectorAll('.point-input').forEach(input => {
                 input.addEventListener('input', () => {
-                    input.value = Math.abs(input.value); // 防負數
+                    input.value = Math.abs(input.value); 
                     input.closest('.point-container').classList.remove('error-highlight');
                     this.calculatePoints();
                     this.saveDraft();
@@ -223,11 +218,9 @@ class SurveyEngine {
         const form = document.getElementById('impactForm');
         const data = new FormData(form);
         
-        // 計算 Radio 題
         for (let [key, value] of data.entries()) {
             if (key.startsWith('q') && value) answered++;
         }
-        // 計算數字題
         document.querySelectorAll('.point-input').forEach(input => {
             if (input.value !== '' && !isNaN(parseInt(input.value))) answered++;
         });
@@ -283,7 +276,6 @@ class SurveyEngine {
         let firstInvalidEl = null;
         const form = document.getElementById('impactForm');
 
-        // 防呆驗證
         const checkRadioGroup = (namePrefix, length) => {
             for(let i=0; i<length; i++) {
                 if(!document.querySelector(`input[name="${namePrefix}_${i}"]:checked`)) {
@@ -330,16 +322,14 @@ class SurveyEngine {
             return;
         }
 
-        // 送出資料
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `資料寫入中...`; // 省略 SVG 以節省字數
+        submitBtn.innerHTML = `資料寫入中...`; 
         
         const dataObj = Object.fromEntries(new FormData(form).entries());
         dataObj.submit_time = new Date().toLocaleString('zh-TW');
 
         try {
-            // ⚠️ 您的 API URL 安全保留
             const API_URL = 'https://script.google.com/macros/s/AKfycbyz4GriyYF0U9KfWrWAITKjffWK90bNxbEYZQs4GqG2RulzrZo2Tu_z8c3MceYgiyaGYA/exec';
             const response = await fetch(API_URL, {
                 method: 'POST', body: JSON.stringify(dataObj), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
@@ -365,46 +355,57 @@ class SurveyEngine {
     }
 }
 
-// --- 🌟 終極全局視覺修正補丁（已解決透明邊框干擾問題） ---
+// --- 🌟 最終 UI 補丁：完美復刻斑馬紋無框清單 (強制覆蓋所有裝置) ---
 (function applyGlobalStyleFix() {
     const style = document.createElement('style');
     style.innerHTML = `
-        @media (min-width: 768px) {
-            /* 1. 容器：完美的 1px 外框 */
-            .table-container { 
-                border: 1px solid #e2e8f0 !important; 
-                border-radius: 0.5rem !important;
-                box-shadow: none !important;
-            }
-            /* 2. 表格本體：改用 separate 徹底解決邊框渲染打架的問題 */
-            .table-container table { 
-                border-collapse: separate !important; 
-                border-spacing: 0 !important; 
-                border: none !important;
-            }
-            /* 3. 殺掉造成右側擠壓的罪魁禍首：隱形的 2px 邊框 */
-            .table-container tbody tr { 
-                border: none !important; 
-            }
-            /* 4. 重新繪製乾淨的水平分隔線（由儲存格負責畫底線） */
-            .table-container thead th { 
-                border-bottom: 1px solid #e2e8f0 !important; 
-                border-left: none !important;
-                border-right: none !important;
-            }
-            .table-container tbody tr td { 
-                border-bottom: 1px solid #e2e8f0 !important; 
-                border-left: none !important;
-                border-right: none !important;
-            }
-            /* 5. 底部不畫線，避免和容器外框疊加成 2px */
-            .table-container tbody tr:last-child td { 
-                border-bottom: none !important; 
-            }
-            /* 6. 選中效果改為純背景色，不再動用 border，確保不影響粗細 */
-            .matrix-row-selected td {
-                background-color: #f0fdf4 !important;
-            }
+        /* 1. 強制消滅舊有 HTML 內的卡片式手機排版 */
+        @media (max-width: 768px) {
+            .table-container table { display: table !important; width: 100% !important; }
+            .table-container thead { display: table-header-group !important; }
+            .table-container tbody { display: table-row-group !important; }
+            .table-container tr { display: table-row !important; margin: 0 !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; background: transparent !important; }
+            .table-container th, .table-container td { display: table-cell !important; border: none !important; }
+            .table-container td::before { display: none !important; } /* 隱藏舊版手機的文字標籤 */
+        }
+
+        /* 2. 完美復刻截圖外觀：斑馬紋、無邊框、左右滾動 */
+        .table-container {
+            border-radius: 0.5rem !important;
+            overflow-x: auto !important; /* 確保手機版可以順暢左右滑動 */
+            box-shadow: 0 0 0 1px #f1f5f9 inset !important; /* 極淡的外框保護 */
+        }
+        .table-container table {
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            border: none !important;
+        }
+        .table-container thead th {
+            background-color: transparent !important;
+            border-bottom: 2px solid #f1f5f9 !important; /* 標題底下的淡淡分隔線 */
+            color: #475569 !important;
+            font-weight: 600 !important;
+            padding-bottom: 1.25rem !important;
+        }
+        /* 斑馬紋交錯效果 */
+        .table-container tbody tr:nth-child(even) {
+            background-color: #f8fafc !important; /* 淡灰色底 */
+        }
+        .table-container tbody tr:nth-child(odd) {
+            background-color: #ffffff !important; /* 純白底 */
+        }
+        .table-container tbody tr td {
+            border: none !important; /* 徹底消滅內部邊框 */
+            vertical-align: middle !important;
+            transition: background-color 0.2s ease;
+        }
+        /* 選中時的淡淡綠色提示 */
+        .table-container tbody tr.matrix-row-selected td {
+            background-color: #f0fdf4 !important;
+        }
+        /* 未填答時的錯誤紅框提示 (僅限外框，不破壞斑馬紋) */
+        .table-container tbody tr.error-highlight {
+            box-shadow: inset 0 0 0 2px #ef4444 !important; 
         }
     `;
     document.head.appendChild(style);
