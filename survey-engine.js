@@ -365,14 +365,47 @@ class SurveyEngine {
     }
 }
 
-// --- 🌟 全局視覺修正補丁放在這裡（Class 外面） ---
+// --- 🌟 終極全局視覺修正補丁（已解決透明邊框干擾問題） ---
 (function applyGlobalStyleFix() {
     const style = document.createElement('style');
     style.innerHTML = `
-        .table-container { border: 1px solid #e2e8f0 !important; box-shadow: none !important; }
-        .table-container table { border-collapse: collapse !important; }
-        .table-container tbody tr:last-child td, .table-container tbody tr:last-child th { border-bottom: 0 !important; }
-        .table-container th:last-child, .table-container td:last-child { border-right: 0 !important; }
+        @media (min-width: 768px) {
+            /* 1. 容器：完美的 1px 外框 */
+            .table-container { 
+                border: 1px solid #e2e8f0 !important; 
+                border-radius: 0.5rem !important;
+                box-shadow: none !important;
+            }
+            /* 2. 表格本體：改用 separate 徹底解決邊框渲染打架的問題 */
+            .table-container table { 
+                border-collapse: separate !important; 
+                border-spacing: 0 !important; 
+                border: none !important;
+            }
+            /* 3. 殺掉造成右側擠壓的罪魁禍首：隱形的 2px 邊框 */
+            .table-container tbody tr { 
+                border: none !important; 
+            }
+            /* 4. 重新繪製乾淨的水平分隔線（由儲存格負責畫底線） */
+            .table-container thead th { 
+                border-bottom: 1px solid #e2e8f0 !important; 
+                border-left: none !important;
+                border-right: none !important;
+            }
+            .table-container tbody tr td { 
+                border-bottom: 1px solid #e2e8f0 !important; 
+                border-left: none !important;
+                border-right: none !important;
+            }
+            /* 5. 底部不畫線，避免和容器外框疊加成 2px */
+            .table-container tbody tr:last-child td { 
+                border-bottom: none !important; 
+            }
+            /* 6. 選中效果改為純背景色，不再動用 border，確保不影響粗細 */
+            .matrix-row-selected td {
+                background-color: #f0fdf4 !important;
+            }
+        }
     `;
     document.head.appendChild(style);
 })();
