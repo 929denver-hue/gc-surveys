@@ -14,7 +14,18 @@ class SurveyEngine {
         this.loadDraft();
         this.updateProgress();
     }
-
+// --- 全局視覺修正補丁：消除矩陣題外框粗細不均 ---
+(function applyGlobalStyleFix() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .table-container { border: 1px solid #e2e8f0 !important; box-shadow: none !important; }
+        .table-container table { border-collapse: collapse !important; }
+        .table-container tbody tr:last-child td, .table-container tbody tr:last-child th { border-bottom: 0 !important; }
+        .table-container th:last-child, .table-container td:last-child { border-right: 0 !important; }
+    `;
+    document.head.appendChild(style);
+})();
+    
     render() {
         let html = `
             <div class="fixed top-0 left-0 w-full bg-white shadow-sm z-50 border-b border-gray-200">
