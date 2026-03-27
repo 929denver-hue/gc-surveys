@@ -8,27 +8,31 @@ class SurveyEngine {
     }
 
     init() {
-        // 🚨 防彈機制：如果發生任何錯誤，直接將錯誤訊息印在畫面上，不再是一片空白！
-        try {
-            this.render();
-            this.bindEvents();
-            this.loadDraft();
-            this.updateProgress();
-        } catch (error) {
-            console.error("SurveyEngine Error:", error);
-            if (this.app) {
-                this.app.innerHTML = `
-                <div style="padding: 20px; color: #b91c1c; background: #fef2f2; border: 1px solid #f87171; border-radius: 8px; margin: 20px;">
-                    <h2 style="font-weight: bold; font-size: 1.5rem; margin-bottom: 10px;">🚨 系統發生錯誤</h2>
-                    <p>請將以下錯誤訊息截圖給工程師：</p>
-                    <pre style="white-space: pre-wrap; margin-top: 10px; font-size: 0.875rem; background: #fff; padding: 10px; border-radius: 4px;">${error.message}\n${error.stack}</pre>
-                </div>`;
-            }
-        }
+        this.render();
+        this.bindEvents();
+        this.loadDraft();
+        this.updateProgress();
     }
     
     render() {
         let html = `
+            <style>
+                /* 專業版問卷的核心 UX 樣式 */
+                .matrix-row { transition: all 0.3s ease; }
+                .matrix-row-selected { background-color: #f8fafc; border-color: #cbd5e1 !important; }
+                @media (min-width: 768px) { .matrix-row-selected { background-color: #f0fdf4; border-color: transparent !important; } }
+                
+                /* 錯誤提示高亮 */
+                .error-highlight { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; border-radius: 0.75rem !important; }
+                
+                /* 利用 CSS :has() 達成手機版按鈕點擊後的完美高亮 (免 JS) */
+                .option-btn:has(input:checked) {
+                    border-color: #6366f1 !important;
+                    background-color: #eef2ff !important;
+                }
+                .option-btn:has(input:checked) span { color: #4338ca !important; font-weight: 800 !important; }
+            </style>
+
             <div class="fixed top-0 left-0 w-full bg-white shadow-sm z-50 border-b border-gray-200">
                 <div class="max-w-3xl mx-auto px-4 py-2 flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">整體作答進度</span>
@@ -39,31 +43,32 @@ class SurveyEngine {
                 </div>
             </div>
 
-            <main class="max-w-3xl mx-auto mt-12 md:mt-16 bg-white shadow-md md:rounded-lg overflow-hidden" id="main-container">
-                <div class="bg-indigo-600 text-white p-6">
-                    <h1 class="text-2xl font-bold">${this.config.title || 'GC贈物網問卷'}</h1>
-                    <p class="mt-2 text-indigo-100">${this.config.description || ''}</p>
-                    <p class="mt-1 text-sm text-indigo-200"><span class="text-red-400 font-bold">*</span>表示必填問題</p>
+            <main class="max-w-4xl mx-auto mt-12 md:mt-16 bg-white md:shadow-lg md:rounded-xl overflow-hidden mb-10" id="main-container">
+                <div class="bg-indigo-600 text-white p-6 md:p-8">
+                    <h1 class="text-2xl md:text-3xl font-bold">${this.config.title}</h1>
+                    <p class="mt-3 text-indigo-100 md:text-lg leading-relaxed">${this.config.description}</p>
+                    <p class="mt-2 text-sm text-indigo-200"><span class="text-red-400 font-bold">*</span>表示必填問題</p>
                 </div>
 
-                <form id="impactForm" class="p-6 space-y-10" novalidate>
-                    <input type="hidden" name="survey_target" value="${this.config.surveyId || ''}">
+                <form id="impactForm" class="p-4 md:p-8 space-y-12" novalidate>
+                    <input type="hidden" name="survey_target" value="${this.config.surveyId}">
         `;
 
-        if (this.config.baseQuestion && this.config.baseQuestion.options) {
+        // 1. 基本問題
+        if (this.config.baseQuestion) {
             this.totalRequired += 1;
             let descHtml = this.config.baseQuestion.description ? `<p class="text-sm text-gray-500 mb-6">${this.config.baseQuestion.description}</p>` : '';
             html += `
                 <section>
-                    <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">基本問題</h2>
+                    <h2 class="text-2xl font-bold border-b-2 border-gray-100 pb-3 mb-5 text-gray-800">基本問題</h2>
                     ${descHtml}
-                    <div class="mb-8 p-4 bg-white border border-gray-200 rounded-lg shadow-sm" data-name="q0_container">
-                        <label class="block font-semibold mb-4 text-lg">${this.config.baseQuestion.title} <span class="text-red-500 font-bold">*</span></label>
+                    <div class="mb-8 p-5 bg-white border border-gray-200 rounded-xl shadow-sm" data-name="q0_container">
+                        <label class="block font-bold mb-4 text-lg">${this.config.baseQuestion.title} <span class="text-red-500 font-bold">*</span></label>
                         <div class="space-y-3">
                             ${this.config.baseQuestion.options.map(opt => `
-                                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-50 rounded">
-                                    <input type="radio" name="q0" value="${opt}" class="w-5 h-5 text-indigo-600" required>
-                                    <span class="text-gray-700">${opt}</span>
+                                <label class="flex items-center space-x-3 cursor-pointer p-3 border border-gray-100 rounded-lg hover:bg-indigo-50 transition-colors option-btn">
+                                    <input type="radio" name="q0" value="${opt}" class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" required>
+                                    <span class="text-gray-700 font-medium">${opt}</span>
                                 </label>
                             `).join('')}
                         </div>
@@ -72,38 +77,40 @@ class SurveyEngine {
             `;
         }
 
-        let matrixDescHtml = this.config.matrixDescription ? `<p class="text-sm text-gray-500 mb-6">${this.config.matrixDescription}</p>` : '';
+        // 2. 矩陣題 1 & 2
+        let matrixDescHtml = this.config.matrixDescription ? `<p class="text-gray-500 mb-6 font-medium">${this.config.matrixDescription}</p>` : '';
         html += `
             <section>
-                <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">個別面向</h2>
+                <h2 class="text-2xl font-bold border-b-2 border-gray-100 pb-3 mb-5 text-gray-800">個別面向</h2>
                 ${matrixDescHtml}
                 ${this.renderMatrix('q1', this.config.matrix1)}
                 ${this.renderMatrix('q2', this.config.matrix2)}
             </section>
         `;
 
-        if (this.config.pointsConfig && this.config.pointsConfig.items) {
+        // 3. 價值結構
+        if (this.config.pointsConfig) {
             this.totalRequired += this.config.pointsConfig.items.length;
             html += `
-                <section class="bg-indigo-50/50 p-4 rounded-xl" id="points-section-container">
-                    <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">價值結構</h2>
-                    <p class="text-sm text-gray-700 mb-4 bg-white border border-indigo-100 p-3 rounded">${this.config.pointsConfig.description}</p>
+                <section class="bg-indigo-50/50 p-5 md:p-8 rounded-2xl border border-indigo-100" id="points-section-container">
+                    <h2 class="text-2xl font-bold border-b-2 border-indigo-200 pb-3 mb-5 text-indigo-900">價值結構</h2>
+                    <p class="text-sm text-indigo-800 mb-6 bg-white shadow-sm p-4 rounded-lg font-medium leading-relaxed">${this.config.pointsConfig.description}</p>
                     
-                    <div class="sticky top-10 bg-indigo-50/90 backdrop-blur py-3 z-10 border-b border-indigo-200 mb-6 -mx-4 px-4">
-                        <div class="flex justify-between text-sm font-bold mb-1">
-                            <span class="text-indigo-900">點數分配進度</span>
-                            <span id="point-status" class="text-indigo-600">0 / 100</span>
+                    <div class="sticky top-10 bg-white/90 backdrop-blur-md py-4 z-10 border-b border-indigo-100 mb-6 -mx-5 px-5 md:-mx-8 md:px-8 shadow-sm">
+                        <div class="flex justify-between text-sm font-bold mb-2">
+                            <span class="text-gray-700">點數分配進度</span>
+                            <span id="point-status" class="text-indigo-600 text-lg">0 / 100</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div id="point-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="point-progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
                         </div>
                     </div>
 
-                    <div class="space-y-4 max-w-sm mx-auto" id="point-inputs">
+                    <div class="space-y-4 max-w-lg mx-auto" id="point-inputs">
                         ${this.config.pointsConfig.items.map((item, i) => `
-                            <div class="point-container bg-white p-1 rounded transition-all">
-                                <label class="block mb-1 font-semibold text-gray-800">${i+1}. ${item}<span class="text-red-500 font-bold">*</span></label>
-                                <input type="number" name="point_${i+1}" min="0" max="100" inputmode="numeric" class="point-input w-full border border-gray-300 rounded p-3 text-lg focus:ring-indigo-500" required placeholder="請輸入點數">
+                            <div class="point-container bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition-all">
+                                <label class="block mb-3 font-bold text-gray-800 text-base">${i+1}. ${item}<span class="text-red-500">*</span></label>
+                                <input type="number" name="point_${i+1}" min="0" max="100" inputmode="numeric" class="point-input w-full border border-gray-300 rounded-lg p-3 text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow" required placeholder="請輸入分配點數 (例如: 20)">
                             </div>
                         `).join('')}
                     </div>
@@ -111,63 +118,73 @@ class SurveyEngine {
             `;
         }
 
+        // 4. 精進之處與回饋
         html += `
             <section>
-                <h2 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4">精進之處</h2>
+                <h2 class="text-2xl font-bold border-b-2 border-gray-100 pb-3 mb-5 text-gray-800">精進之處</h2>
                 ${this.renderMatrix('q7', this.config.matrix3)}
-                <div class="mb-8 mt-8">
-                    <label class="block font-semibold mb-3">2. 其他意見回饋</label>
-                    <textarea name="other_feedback" class="w-full border border-gray-300 rounded p-3 h-24 focus:ring-indigo-500" placeholder="您的回答"></textarea>
+                <div class="mb-8 mt-10 bg-gray-50 p-5 md:p-8 rounded-xl border border-gray-200">
+                    <label class="block font-bold mb-3 text-lg text-gray-800">2. 其他意見回饋 <span class="text-sm font-normal text-gray-500">(選填)</span></label>
+                    <textarea name="other_feedback" class="w-full border border-gray-300 rounded-lg p-4 h-32 focus:ring-2 focus:ring-indigo-500 outline-none resize-none" placeholder="有什麼想告訴我們的嗎？歡迎在此填寫..."></textarea>
                 </div>
             </section>
             </form>
-            <div class="pb-8 pt-4 text-center text-sm text-gray-400 border-t border-gray-100 mx-6">
-                這份表單是在 樹冠影響力投資股份有限公司 中建立
+            <div class="pb-8 pt-4 text-center text-sm text-gray-400 mx-6">
+                內部問卷系統 © 樹冠影響力投資股份有限公司
             </div>
             </main>
 
-            <div id="sticky-footer" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] z-40 flex flex-col md:flex-row justify-between items-center gap-3">
-                <span id="footer-msg" class="text-gray-500 font-medium text-sm">請完成所有必填項目</span>
-                <div class="flex gap-4">
-                    <button type="button" class="text-sm font-bold text-gray-400 hover:text-red-500 px-2" id="clear-btn">清除表單</button>
-                    <button type="submit" form="impactForm" id="submit-btn" class="bg-indigo-600 text-white px-8 py-3 rounded font-bold hover:bg-indigo-700 shadow-md">送出問卷</button>
+            <div id="sticky-footer" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.1)] z-40 flex flex-col md:flex-row justify-between items-center gap-3">
+                <span id="footer-msg" class="text-gray-500 font-bold text-sm">請確認完成所有必填項目</span>
+                <div class="flex gap-4 w-full md:w-auto">
+                    <button type="button" class="text-sm font-bold text-gray-400 hover:text-red-500 px-4 py-3 md:py-0 w-1/3 md:w-auto" id="clear-btn">清除</button>
+                    <button type="submit" form="impactForm" id="submit-btn" class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-indigo-700 shadow-md w-2/3 md:w-auto text-lg md:text-base transition-colors">送出問卷</button>
                 </div>
             </div>
         `;
         this.app.innerHTML = html;
     }
 
+    // --- 🌟 史詩級重構：雙棲排版引擎 ---
     renderMatrix(namePrefix, matrixConfig) {
-        // 🚨 防彈機制：確保該有的陣列都有，否則回傳空字串不當機
-        if (!matrixConfig || !matrixConfig.items || !matrixConfig.labels) return ''; 
-        
         this.totalRequired += matrixConfig.items.length;
+        const optionCount = matrixConfig.labels.length;
+
         return `
-            <div class="mb-8">
-                <label class="block font-semibold mb-3 text-lg">${matrixConfig.title} <span class="text-red-500 font-bold">*</span></label>
-                <div class="table-container">
-                    <table class="w-full text-sm text-left whitespace-nowrap">
-                        <thead>
-                            <tr>
-                                <th class="p-4 w-1/3 min-w-[150px]"></th>
-                                ${matrixConfig.labels.map(l => `<th class="p-4 text-center min-w-[100px]">${l}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${matrixConfig.items.map((item, index) => `
-                                <tr data-name="${namePrefix}_${index}">
-                                    <td class="p-4 font-medium whitespace-normal text-gray-800">${item}</td>
+            <div class="mb-12">
+                <label class="block font-bold mb-6 text-xl text-indigo-900 border-l-4 border-indigo-500 pl-3">
+                    ${matrixConfig.title} <span class="text-red-500">*</span>
+                </label>
+
+                <div class="hidden md:flex flex-row items-center px-4 pb-3 border-b-2 border-gray-800">
+                    <div class="flex-[3] pr-4"></div>
+                    ${matrixConfig.labels.map(l => `
+                        <div class="flex-[1] text-center font-bold text-sm text-gray-500">${l}</div>
+                    `).join('')}
+                </div>
+
+                <div class="space-y-6 md:space-y-0">
+                    ${matrixConfig.items.map((item, index) => `
+                        <div class="matrix-row bg-white border border-gray-200 rounded-xl p-5 shadow-sm md:shadow-none md:border-0 md:border-b md:border-gray-100 md:rounded-none md:p-4 hover:bg-gray-50" data-name="${namePrefix}_${index}">
+
+                            <div class="flex flex-col md:flex-row md:items-center">
+
+                                <div class="flex-[3] pr-4 font-bold md:font-medium text-lg md:text-sm text-gray-800 mb-5 md:mb-0">
+                                    <div class="md:hidden inline-block bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded mb-3">第 ${index + 1} 題</div>
+                                    <div class="leading-relaxed">${item}</div>
+                                </div>
+
+                                <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 w-full md:w-auto md:flex-[${optionCount}]">
                                     ${matrixConfig.labels.map(label => `
-                                        <td class="p-4 text-center">
-                                            <label class="cursor-pointer block w-full h-full flex items-center justify-center">
-                                                <input type="radio" name="${namePrefix}_${index}" value="${label}" class="w-5 h-5 text-indigo-600">
-                                            </label>
-                                        </td>
+                                        <label class="option-btn relative flex-[1] flex items-center md:justify-center p-4 md:p-0 border-2 border-gray-100 rounded-xl md:border-none md:rounded-none cursor-pointer hover:bg-indigo-50 transition-all">
+                                            <input type="radio" name="${namePrefix}_${index}" value="${label}" class="w-6 h-6 md:w-5 md:h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                            <span class="ml-3 md:hidden font-bold text-gray-600">${label}</span>
+                                        </label>
                                     `).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
@@ -175,32 +192,28 @@ class SurveyEngine {
 
     bindEvents() {
         const form = document.getElementById('impactForm');
-        if (!form) return;
         
+        // 互動反饋與暫存
         form.addEventListener('change', (e) => {
             if (e.target.type === 'radio') {
                 if (e.target.name === 'q0') {
-                    const container = e.target.closest('[data-name="q0_container"]');
-                    if (container) container.classList.remove('error-highlight');
+                    e.target.closest('[data-name="q0_container"]').classList.remove('error-highlight');
                 } else {
-                    const tr = e.target.closest('tr');
-                    if (tr) {
-                        tr.parentElement.querySelectorAll('tr').forEach(r => r.classList.remove('matrix-row-selected'));
-                        tr.classList.remove('error-highlight');
-                        tr.classList.add('matrix-row-selected');
-                    }
+                    const row = e.target.closest('.matrix-row');
+                    row.classList.remove('error-highlight');
+                    // 移除同儕干擾，僅針對當前行標示已選擇 (配合 CSS 控制桌機版背景)
+                    row.classList.add('matrix-row-selected');
                 }
             }
             this.saveDraft();
             this.updateProgress();
         });
 
-        if (this.config.pointsConfig && this.config.pointsConfig.items) {
+        if (this.config.pointsConfig) {
             document.querySelectorAll('.point-input').forEach(input => {
                 input.addEventListener('input', () => {
                     input.value = Math.abs(input.value); 
-                    const container = input.closest('.point-container');
-                    if (container) container.classList.remove('error-highlight');
+                    input.closest('.point-container').classList.remove('error-highlight');
                     this.calculatePoints();
                     this.saveDraft();
                     this.updateProgress();
@@ -208,9 +221,7 @@ class SurveyEngine {
             });
         }
 
-        const clearBtn = document.getElementById('clear-btn');
-        if (clearBtn) clearBtn.addEventListener('click', () => this.clearForm());
-        
+        document.getElementById('clear-btn').addEventListener('click', () => this.clearForm());
         form.addEventListener('submit', (e) => this.submitForm(e));
     }
 
@@ -220,27 +231,24 @@ class SurveyEngine {
         
         const pBar = document.getElementById('point-progress-bar');
         const pStatus = document.getElementById('point-status');
-        if (!pBar || !pStatus) return total;
         
         pBar.style.width = `${Math.min(total, 100)}%`;
         pStatus.textContent = `${total} / 100`;
         
         if (total === 100) {
-            pBar.className = "bg-green-500 h-2 rounded-full transition-all";
-            pStatus.className = "text-green-600 font-bold";
+            pBar.className = "bg-green-500 h-2.5 rounded-full transition-all duration-300";
+            pStatus.className = "text-green-600 font-bold text-lg";
         } else {
             const isOver = total > 100;
-            pBar.className = `${isOver ? 'bg-red-500' : 'bg-indigo-600'} h-2 rounded-full transition-all`;
-            pStatus.className = `${isOver ? 'text-red-500' : 'text-indigo-600'} font-bold`;
+            pBar.className = `${isOver ? 'bg-red-500' : 'bg-indigo-600'} h-2.5 rounded-full transition-all duration-300`;
+            pStatus.className = `${isOver ? 'text-red-500' : 'text-indigo-600'} font-bold text-lg`;
         }
         return total;
     }
 
     updateProgress() {
-        if (this.totalRequired === 0) return;
         let answered = 0;
         const form = document.getElementById('impactForm');
-        if (!form) return;
         const data = new FormData(form);
         
         for (let [key, value] of data.entries()) {
@@ -251,54 +259,40 @@ class SurveyEngine {
         });
 
         const percentage = Math.round((answered / this.totalRequired) * 100);
-        const pBar = document.getElementById('overall-progress-bar');
-        const pText = document.getElementById('overall-progress-text');
-        if (pBar) pBar.style.width = `${percentage}%`;
-        if (pText) pText.innerText = `${percentage}%`;
+        document.getElementById('overall-progress-bar').style.width = `${percentage}%`;
+        document.getElementById('overall-progress-text').innerText = `${percentage}%`;
     }
 
     saveDraft() {
-        const form = document.getElementById('impactForm');
-        if (!form) return;
-        const data = Object.fromEntries(new FormData(form).entries());
+        const data = Object.fromEntries(new FormData(document.getElementById('impactForm')).entries());
         localStorage.setItem(this.storageKey, JSON.stringify(data));
     }
 
     loadDraft() {
         const draft = localStorage.getItem(this.storageKey);
         if (!draft) return;
-        try {
-            const data = JSON.parse(draft);
-            const form = document.getElementById('impactForm');
-            if (!form) return;
-            
-            Object.entries(data).forEach(([key, value]) => {
-                const el = form.elements[key];
-                if (!el) return;
-                if (el.length) {
-                    const target = Array.from(el).find(r => r.value === value);
-                    if (target) {
-                        target.checked = true;
-                        // 拔除舊版高風險語法，確保舊手機相容
-                        if (key !== 'q0') {
-                            const tr = target.closest('tr');
-                            if (tr) tr.classList.add('matrix-row-selected');
-                        }
-                    }
-                } else {
-                    el.value = value;
+        const data = JSON.parse(draft);
+        const form = document.getElementById('impactForm');
+        
+        Object.entries(data).forEach(([key, value]) => {
+            const el = form.elements[key];
+            if (!el) return;
+            if (el.length) {
+                const target = Array.from(el).find(r => r.value === value);
+                if (target) {
+                    target.checked = true;
+                    if(key !== 'q0') target.closest('.matrix-row')?.classList.add('matrix-row-selected');
                 }
-            });
-            if (this.config.pointsConfig) this.calculatePoints();
-        } catch(e) {
-            console.error("Draft load error", e);
-        }
+            } else {
+                el.value = value;
+            }
+        });
+        if (this.config.pointsConfig) this.calculatePoints();
     }
 
     clearForm() {
         if(confirm('確定要清除所有填寫進度嗎？這將無法復原。')) {
-            const form = document.getElementById('impactForm');
-            if (form) form.reset();
+            document.getElementById('impactForm').reset();
             localStorage.removeItem(this.storageKey);
             document.querySelectorAll('.matrix-row-selected, .error-highlight').forEach(el => el.classList.remove('matrix-row-selected', 'error-highlight'));
             if (this.config.pointsConfig) this.calculatePoints();
@@ -319,59 +313,51 @@ class SurveyEngine {
             for(let i=0; i<length; i++) {
                 if(!document.querySelector(`input[name="${namePrefix}_${i}"]:checked`)) {
                     isValid = false;
-                    const el = document.querySelector(`tr[data-name="${namePrefix}_${i}"]`);
-                    if (el) {
-                        el.classList.add('error-highlight');
-                        if(!firstInvalidEl) firstInvalidEl = el;
-                    }
+                    const el = document.querySelector(`div[data-name="${namePrefix}_${i}"]`);
+                    el.classList.add('error-highlight');
+                    if(!firstInvalidEl) firstInvalidEl = el;
                 }
             }
         };
 
-        if (this.config.baseQuestion && this.config.baseQuestion.options && !document.querySelector(`input[name="q0"]:checked`)) {
+        if (this.config.baseQuestion && !document.querySelector(`input[name="q0"]:checked`)) {
             isValid = false;
             firstInvalidEl = document.querySelector('[data-name="q0_container"]');
-            if (firstInvalidEl) firstInvalidEl.classList.add('error-highlight');
+            firstInvalidEl.classList.add('error-highlight');
         }
 
-        if (this.config.matrix1 && this.config.matrix1.items) checkRadioGroup('q1', this.config.matrix1.items.length);
-        if (this.config.matrix2 && this.config.matrix2.items) checkRadioGroup('q2', this.config.matrix2.items.length);
-        if (this.config.matrix3 && this.config.matrix3.items) checkRadioGroup('q7', this.config.matrix3.items.length);
+        checkRadioGroup('q1', this.config.matrix1.items.length);
+        checkRadioGroup('q2', this.config.matrix2.items.length);
+        checkRadioGroup('q7', this.config.matrix3.items.length);
 
-        if (this.config.pointsConfig && this.config.pointsConfig.items) {
+        if (this.config.pointsConfig) {
             let totalPts = 0;
             document.querySelectorAll('.point-input').forEach(input => {
                 if(input.value === '') {
                     isValid = false;
                     const container = input.closest('.point-container');
-                    if (container) {
-                        container.classList.add('error-highlight');
-                        if(!firstInvalidEl) firstInvalidEl = container;
-                    }
+                    container.classList.add('error-highlight');
+                    if(!firstInvalidEl) firstInvalidEl = container;
                 }
                 totalPts += (parseInt(input.value) || 0);
             });
             if (isValid && totalPts !== 100) {
                 isValid = false;
                 firstInvalidEl = document.getElementById('points-section-container');
-                if (firstInvalidEl) firstInvalidEl.classList.add('error-highlight');
+                firstInvalidEl.classList.add('error-highlight');
                 alert(`價值結構的點數加總必須剛好為 100 點！（目前為 ${totalPts} 點）`);
             }
         }
 
         if (!isValid) {
-            if (firstInvalidEl) {
-                const y = firstInvalidEl.getBoundingClientRect().top + window.scrollY - 80;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-            }
+            const y = firstInvalidEl.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top: y, behavior: 'smooth' });
             return;
         }
 
         const submitBtn = document.getElementById('submit-btn');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `資料寫入中...`; 
-        }
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `資料寫入中...`; 
         
         const dataObj = Object.fromEntries(new FormData(form).entries());
         dataObj.submit_time = new Date().toLocaleString('zh-TW');
@@ -385,80 +371,19 @@ class SurveyEngine {
             
             if (result.status === 'success') {
                 localStorage.removeItem(this.storageKey);
-                const footer = document.getElementById('sticky-footer');
-                const header = document.querySelector('.fixed.top-0');
-                const main = document.getElementById('main-container');
-                
-                if (footer) footer.style.display = 'none';
-                if (header) header.style.display = 'none';
-                if (main) {
-                    main.innerHTML = `
+                document.getElementById('sticky-footer').style.display = 'none';
+                document.querySelector('.fixed.top-0').style.display = 'none';
+                document.getElementById('main-container').innerHTML = `
                     <div class="p-12 text-center bg-white rounded-lg mt-8">
-                        <div class="text-6xl mb-4">🎉</div><h2 class="text-3xl font-bold text-indigo-700 mb-4">問卷送出成功！</h2>
-                        <p class="text-gray-600">非常感謝您的寶貴回饋，這對我們意義重大。</p>
+                        <div class="text-6xl mb-6">🎉</div><h2 class="text-3xl font-bold text-indigo-700 mb-4">問卷送出成功！</h2>
+                        <p class="text-gray-600 text-lg">非常感謝您的寶貴回饋，這對我們意義重大。</p>
                     </div>`;
-                }
                 window.scrollTo(0, 0);
             } else throw new Error(result.message);
         } catch (error) {
             alert('伺服器連線異常，但您的進度已保留！');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '送出問卷';
-            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = '送出問卷';
         }
     }
-}
-
-// --- 🌟 最終 UI 補丁：完美復刻斑馬紋無框清單 ---
-try {
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @media (max-width: 768px) {
-            .table-container table { display: table !important; width: 100% !important; }
-            .table-container thead { display: table-header-group !important; }
-            .table-container tbody { display: table-row-group !important; }
-            .table-container tr { display: table-row !important; margin: 0 !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; background: transparent !important; }
-            .table-container th, .table-container td { display: table-cell !important; border: none !important; }
-            .table-container td::before { display: none !important; } 
-        }
-
-        .table-container {
-            border-radius: 0.5rem !important;
-            overflow-x: auto !important; 
-            box-shadow: 0 0 0 1px #f1f5f9 inset !important; 
-        }
-        .table-container table {
-            border-collapse: collapse !important;
-            border-spacing: 0 !important;
-            border: none !important;
-        }
-        .table-container thead th {
-            background-color: transparent !important;
-            border-bottom: 2px solid #f1f5f9 !important; 
-            color: #475569 !important;
-            font-weight: 600 !important;
-            padding-bottom: 1.25rem !important;
-        }
-        .table-container tbody tr:nth-child(even) {
-            background-color: #f8fafc !important; 
-        }
-        .table-container tbody tr:nth-child(odd) {
-            background-color: #ffffff !important; 
-        }
-        .table-container tbody tr td {
-            border: none !important; 
-            vertical-align: middle !important;
-            transition: background-color 0.2s ease;
-        }
-        .table-container tbody tr.matrix-row-selected td {
-            background-color: #f0fdf4 !important;
-        }
-        .table-container tbody tr.error-highlight {
-            box-shadow: inset 0 0 0 2px #ef4444 !important; 
-        }
-    `;
-    document.head.appendChild(style);
-} catch(e) {
-    console.error("Style inject error", e);
 }
