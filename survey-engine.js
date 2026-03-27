@@ -1,4 +1,3 @@
-// 檔案名稱：survey-engine.js
 class SurveyEngine {
     constructor(config) {
         this.config = config;
@@ -14,17 +13,6 @@ class SurveyEngine {
         this.loadDraft();
         this.updateProgress();
     }
-// --- 全局視覺修正補丁：消除矩陣題外框粗細不均 ---
-(function applyGlobalStyleFix() {
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .table-container { border: 1px solid #e2e8f0 !important; box-shadow: none !important; }
-        .table-container table { border-collapse: collapse !important; }
-        .table-container tbody tr:last-child td, .table-container tbody tr:last-child th { border-bottom: 0 !important; }
-        .table-container th:last-child, .table-container td:last-child { border-right: 0 !important; }
-    `;
-    document.head.appendChild(style);
-})();
     
     render() {
         let html = `
@@ -351,7 +339,7 @@ class SurveyEngine {
         dataObj.submit_time = new Date().toLocaleString('zh-TW');
 
         try {
-            // ⚠️ 請填入您的萬能路由 API 網址
+            // ⚠️ 您的 API URL 安全保留
             const API_URL = 'https://script.google.com/macros/s/AKfycbyz4GriyYF0U9KfWrWAITKjffWK90bNxbEYZQs4GqG2RulzrZo2Tu_z8c3MceYgiyaGYA/exec';
             const response = await fetch(API_URL, {
                 method: 'POST', body: JSON.stringify(dataObj), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
@@ -376,3 +364,15 @@ class SurveyEngine {
         }
     }
 }
+
+// --- 🌟 全局視覺修正補丁放在這裡（Class 外面） ---
+(function applyGlobalStyleFix() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .table-container { border: 1px solid #e2e8f0 !important; box-shadow: none !important; }
+        .table-container table { border-collapse: collapse !important; }
+        .table-container tbody tr:last-child td, .table-container tbody tr:last-child th { border-bottom: 0 !important; }
+        .table-container th:last-child, .table-container td:last-child { border-right: 0 !important; }
+    `;
+    document.head.appendChild(style);
+})();
